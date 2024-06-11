@@ -29,7 +29,7 @@ const NewTask = () => {
       <View style={styles.containerFlatList}>
         <FlatList
           data={tasks}
-          renderItem={({item}) => <TaskItem text={item} />}
+          renderItem={({item, index}) => <TaskItem text={item} index={index} />}
           keyExtractor={(_item, index) => index.toString()}
           inverted={true}
         />

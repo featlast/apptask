@@ -17,6 +17,8 @@ import {
   TextInputState,
   addTask,
   changeNewTask,
+  closeEdit,
+  updateTask,
 } from '../redux/features/textInputSlice';
 import useModalAnimation from './useModalAnimation';
 
@@ -25,8 +27,11 @@ const ModalCustom = () => {
   const isModalOpen = useSelector<RootState, boolean>(
     state => state.modal.isOpen,
   );
+  const isEditOpen = useSelector<RootState, boolean>(
+    state => state.textInput.editMode,
+  );
   const scaleValue = useModalAnimation(isModalOpen);
-  const {newTask} = useSelector<RootState, TextInputState>(
+  const {newTask, tasks, id} = useSelector<RootState, TextInputState>(
     state => state.textInput,
   );
 
@@ -46,6 +51,14 @@ const ModalCustom = () => {
     handleCloseModal();
   };
 
+  const handleUpdateTask = () => {
+    if (newTask.trim() !== '') {
+      dispatch(updateTask({id: Number(id), newValue: newTask}));
+    }
+    dispatch(closeEdit());
+    handleCloseModal();
+  };
+
   return (
     <Modal
       transparent
@@ -59,7 +72,7 @@ const ModalCustom = () => {
             <TouchableOpacity
               style={styles.touchable}
               onPress={handleCloseModal}>
-              <Text>close</Text>
+              <Text style={styles.textClose}>close</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.containerInputs}>
@@ -68,11 +81,15 @@ const ModalCustom = () => {
               keyboardType="default"
               style={styles.input}
               onChangeText={text => handleChangeText(text)}
+              cursorColor={'darkgrey'}
+              value={newTask}
             />
             <View style={styles.containerButton}>
               <Button
-                title="Add"
-                onPress={handleAddTextAndCloseModal}
+                title={!isEditOpen ? 'Add' : 'Update'}
+                onPress={
+                  !isEditOpen ? handleAddTextAndCloseModal : handleUpdateTask
+                }
                 disabled={newTask.trim() === ''}
               />
             </View>
@@ -132,6 +149,9 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 5,
     borderRadius: 5,
+    color: 'black',
+    fontWeight: 'bold',
   },
   containerButton: {width: '99%'},
+  textClose: {color: 'darkgrey'},
 });
